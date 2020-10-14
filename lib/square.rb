@@ -12,6 +12,7 @@ class Square
     @illuminated = false
   end
 
+  # need to somehow change red illumination to only work if it's opponent's piece... illimunated boolean in board class 
   def string
     contents = @occupied_by.nil? ? "  " : @occupied_by.to_s 
     if @illuminated == true 

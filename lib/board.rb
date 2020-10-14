@@ -40,6 +40,14 @@ class Board
   def show_path(starting_point)
     path = [] 
     @squares.each { |square| path << square if starting_point.occupied_by.moves.include?(square.co_ord)}
-    path.each{ |square| square.illuminated = true}
+    path.each do |square| 
+      square.illuminated = true
+    end
+  end
+
+  def retrieve_square(co_ord)
+    column = co_ord[0]
+    row = co_ord[1]
+    @squares.select { |square| square.co_ord.first == column && square.co_ord.last == row }.first
   end
 end

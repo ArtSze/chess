@@ -2,9 +2,7 @@ require_relative 'piece'
 require_relative 'output'
 
 class King < Piece
-  include Output
-
-  def to_s
-    self.color == "black" ? "#{BLACK_KING_IMAGE}" : "#{WHITE_KING_IMAGE}"
+  def initialize(color, current_square, moves = [], type = 'king')
+    super(color, current_square, moves, type)
   end
 end 

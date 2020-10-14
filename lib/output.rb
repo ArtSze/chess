@@ -1,16 +1,18 @@
 module Output
-  BLACK_PAWN_IMAGE = "\u{2659} "
-  BLACK_KNIGHT_IMAGE = "\u{2658} "
-  BLACK_BISHOP_IMAGE = "\u{2657} "
-  BLACK_ROOK_IMAGE = "\u{2656} "
-  BLACK_QUEEN_IMAGE = "\u{2655} "
-  BLACK_KING_IMAGE = "\u{2654} "
-  WHITE_PAWN_IMAGE = "\u{265F} "
-  WHITE_KNIGHT_IMAGE = "\u{265E} "
-  WHITE_BISHOP_IMAGE = "\u{265D} "
-  WHITE_ROOK_IMAGE = "\u{265C} "
-  WHITE_QUEEN_IMAGE = "\u{265B} "
-  WHITE_KING_IMAGE = "\u{265A} "
+  IMAGES = {
+    black_pawn: "\u{2659} ",
+    black_knight: "\u{2658} ",
+    black_bishop: "\u{2657} ",
+    black_rook: "\u{2656} ",
+    black_queen: "\u{2655} ",
+    black_king: "\u{2654} ",
+    white_pawn: "\u{265F} ",
+    white_knight: "\u{265E} ",
+    white_bishop: "\u{265D} ",
+    white_rook: "\u{265C} ",
+    white_queen: "\u{265B} ",
+    white_king: "\u{265A} "
+  }
 
   def clear_terminal
     system 'clear'
