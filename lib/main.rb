@@ -14,48 +14,48 @@ game = Board.new
 @white_pieces_in_play = []
 @black_pieces_in_play = []
 
-piece_two = Knight.new('black', ['D', '4'])
-piece_one = Pawn.new('black', ['B', '7'])
-piece_three = Knight.new('white', ['C','6'])
-piece_four = King.new('black', ['C', '7'])
-piece_five = Rook.new('white', ['E', '3'])
-piece_six = Bishop.new('white', ['F', '4'])
-piece_seven = Queen.new('white', ['E', '4'])
+# piece_two = Knight.new('black', ['D', '4'])
+piece_one = Pawn.new('white', ['B', '2'])
+piece_three = Pawn.new('black', ['C','4'])
+# piece_four = King.new('black', ['C', '7'])
+# piece_five = Rook.new('white', ['E', '3'])
+# piece_six = Bishop.new('white', ['F', '4'])
+# piece_seven = Queen.new('white', ['E', '4'])
 
-[piece_two, piece_one, piece_four].each { |piece| @black_pieces_in_play << piece }
-[piece_three, piece_five, piece_six, piece_seven].each { |piece| @white_pieces_in_play << piece }
+# [piece_two, piece_one, piece_four].each { |piece| @black_pieces_in_play << piece }
+# [piece_three, piece_five, piece_six, piece_seven].each { |piece| @white_pieces_in_play << piece }
 
 
-#placing piece into new square
-d4 = game.retrieve_square("D4")
-d4.occupied_by = piece_two
-piece_two.current_square = d4.co_ord
+#placing piece into new square... used during game initialization to populate board
+# d4 = game.retrieve_square("D4")
+# d4.occupied_by = piece_two
+# piece_two.current_square = d4.co_ord
 
-b7 = game.retrieve_square("B7")
-b7.occupied_by = piece_one
-piece_one.current_square = b7.co_ord
+b2 = game.retrieve_square("B2")
+b2.occupied_by = piece_one
+piece_one.current_square = b2.co_ord
 
-c6 = game.retrieve_square('C6')
-c6.occupied_by = piece_three
-piece_three.current_square = c6.co_ord
+c4 = game.retrieve_square('C4')
+c4.occupied_by = piece_three
+piece_three.current_square = c4.co_ord
 
-c7 = game.retrieve_square('C7')
-c7.occupied_by = piece_four
-piece_four.current_square = c7.co_ord
+# c7 = game.retrieve_square('C7')
+# c7.occupied_by = piece_four
+# piece_four.current_square = c7.co_ord
 
-e3 = game.retrieve_square('E3')
-e3.occupied_by = piece_five
-piece_five.current_square = e3.co_ord
+# e3 = game.retrieve_square('E3')
+# e3.occupied_by = piece_five
+# piece_five.current_square = e3.co_ord
 
-f4 = game.retrieve_square('F4')
-f4.occupied_by = piece_six
-piece_six.current_square = f4.co_ord
+# f4 = game.retrieve_square('F4')
+# f4.occupied_by = piece_six
+# piece_six.current_square = f4.co_ord
 
-e4 = game.retrieve_square('E4')
-e4.occupied_by = piece_seven
-piece_seven.current_square = e4.co_ord
+# e4 = game.retrieve_square('E4')
+# e4.occupied_by = piece_seven
+# piece_seven.current_square = e4.co_ord
 
-#pawn opponent on diagonal... replace 'game' with @board 
+# replace 'game' with @board in game.rb
 def pawn_diag(pawn_to_check, game)
   if pawn_to_check.color == 'black'
     left = [(pawn_to_check.current_square.first.ord - 1).chr, (pawn_to_check.current_square.last.to_i - 1).to_s]
@@ -76,7 +76,6 @@ def pawn_diag(pawn_to_check, game)
   end
 end
 
-#will tell you if rook, bishop, or queen's path is cut short by piece in way
 def check_path(piece, game)
   taken = piece.moves.select do |move|
     game.retrieve_square(move).occupied_by.nil? == false
@@ -176,8 +175,6 @@ def check_path(piece, game)
 end
 
 def king_viable_moves(piece)
-  # runs create_moves for all opp pieces in play...
-  # removes any moves from king's move_set that overlap with opp pieces' move_sets
   opp_pieces, opp_moves = [], []
   piece.color == 'black' ? @white_pieces_in_play.each { |piece| opp_pieces << piece } : @black_pieces_in_play.each { |piece| opp_pieces << piece }
   opp_pieces.each do |piece| 
@@ -187,17 +184,30 @@ def king_viable_moves(piece)
   piece.moves.delete_if { |move| opp_moves.include?(move) }
 end
 
+# en_passant method
+# pawn must be at origin
+# pawn must move two squares ahead to a square where an opp pawn is on an adjacent square(left or right) 
+# opp pawn can move diagonally to square beyond OG pawn, taking OG pawn in the process...
+# MUST be done immediately after OG pawn moves two squares... otherwise that pawn cannot be taken en-passant
 
-# game will have white_pieces_in_play and black_pieces_in_play instance variables 
-# that will be used for king_viable_moves etc....
+
+
+
+# promote method
+# discards pawn when: white reaches row 8 || black reaches row 1... initializes queen of same color in pawn's place
+
+# castling method
+
+
 
 
 
 #create move options, check path to remove paths w/obstructions and then show possible path
+
 #specific order of ops for pawn
 # piece_one.create_moves
 # pawn_diag(piece_one, game)
-# game.show_path(b7)
+# game.show_path(b2)
 
 # piece_seven.create_moves
 # check_path(piece_seven, game)
@@ -207,9 +217,9 @@ end
 # check_path(piece_five, game)
 # game.show_path(e3)
 
-piece_four.create_moves
-check_path(piece_four, game)
-king_viable_moves(piece_four)
-game.show_path(c7)
+# piece_four.create_moves
+# check_path(piece_four, game)
+# king_viable_moves(piece_four)
+# game.show_path(c7)
 
 game.draw

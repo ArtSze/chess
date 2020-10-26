@@ -37,12 +37,17 @@ class Board
     puts
   end
 
-  def show_path(starting_point)
+  def show_path(piece)
     path = [] 
-    @squares.each { |square| path << square if starting_point.occupied_by.moves.include?(square.co_ord)}
+    @squares.each { |square| path << square if piece.moves.include?(square.co_ord)}
     path.each do |square| 
       square.illuminated = true
     end
+  end
+
+  def clear_illumination
+    on = @squares.select { |square| square.illuminated == true}
+    on.each { |square| square.illuminated = false }
   end
 
   def retrieve_square(co_ord)
