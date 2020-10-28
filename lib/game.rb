@@ -229,25 +229,35 @@ class Game
     end
   end
 
-  def king_viable_moves(piece) #incorporate king_in_check? to see if any hypothetical moves would put it in check... remove those from @moves if so
+  def king_viable_moves(piece) 
     @analyzing_king_moveset = true
-    bait_spaces = []
+    bait_spaces, unsafe_empties  = [], []
 
     piece.create_moves
 
     immediate_surroundings = piece.moves
     own_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color == piece.color }
     opp_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color != piece.color }
+    empty_spaces = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by == nil }
 
     opp_occupied.each do |check_if_bait|
+      king_space = piece.current_square
       piece_temp_removed = @board.retrieve_square(check_if_bait).occupied_by
       @board.retrieve_square(check_if_bait).occupied_by = nil
+      @board.retrieve_square(king_space).occupied_by = nil
       bait_spaces << check_if_bait if king_in_check?(piece, check_if_bait)
       @board.retrieve_square(check_if_bait).occupied_by = piece_temp_removed
+      @board.retrieve_square(king_space).occupied_by = piece
     end
 
+    empty_spaces.each do |empty_to_check|
+      king_space = piece.current_square
+      @board.retrieve_square(king_space).occupied_by = nil
+      unsafe_empties << empty_to_check if king_in_check?(piece, empty_to_check)
+      @board.retrieve_square(king_space).occupied_by = piece
+    end
 
-    piece.moves.delete_if { |move| king_in_check?(piece, move) || own_occupied.include?(move) || bait_spaces.include?(move)}
+    piece.moves.delete_if { |move| unsafe_empties.include?(move) || own_occupied.include?(move) || bait_spaces.include?(move)}
     
     @analyzing_king_moveset = false
   end
@@ -271,14 +281,24 @@ class Game
     opp_moves.include?(square) ? true : false
   end
 
+  def check_mate?(king)
+    king_viable_moves(king)
+    (king_in_check?(king, king.current_square) && king.moves.length == 0) ? king : false
+  end
+
   def turn
     switch_player
+    @active_player == @player_one ? @active_king = @white_king : @active_king = @black_king
     reset_board
     player_move_piece(choose_piece)
     reset_board
   end
 
   def choose_piece
+    if king_in_check?(@active_king, @active_king.current_square)
+      puts "\nYou must move your king because he is in check."
+      return @active_king.current_square
+    end
     loop do
       puts "\n#{@active_player.color.upcase}'s turn: Which piece would you like to move #{@active_player.name}? (enter its current square e.g. 'A2')" 
       choice = gets.chomp.strip.upcase
@@ -380,10 +400,11 @@ end
 
 game = Game.new
 game.create_players
-game.god_move_piece('E1', 'D3')
-game.god_move_piece('D7', 'D4')
-game.god_move_piece('A8', 'F4')
+game.god_move_piece('E1', 'D4')
+game.god_move_piece('H8', 'E4')
+game.god_move_piece('A8', 'B5')
 # game.god_move_piece('C8', 'D4')
 
 game.turn
 p game.king_in_check?(game.white_king, game.white_king.current_square)
+puts game.check_mate?(game.white_king)
