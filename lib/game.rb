@@ -231,31 +231,24 @@ class Game
 
   def king_viable_moves(piece) #incorporate king_in_check? to see if any hypothetical moves would put it in check... remove those from @moves if so
     @analyzing_king_moveset = true
-    opp_pieces, opp_moves = [], []
-    piece.color == 'black' ? @white_pieces_in_play.each { |piece| opp_pieces << piece } : @black_pieces_in_play.each { |piece| opp_pieces << piece }
-    
-    opp_pieces.each do |opp_piece| 
-      if opp_piece.type == 'pawn' 
-        pawn_diag(opp_piece) 
-      else 
-        opp_piece.create_moves 
-        check_path(opp_piece)
-      end
-      opp_piece.moves.each do |move| 
-        opp_moves << move 
-      end
-    end 
+    bait_spaces = []
 
     piece.create_moves
 
-    #flawed because you only want to remove moves if the bait space is in the move_set of another opp piece
     immediate_surroundings = piece.moves
-    opp_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color != piece.color }
     own_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color == piece.color }
+    opp_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color != piece.color }
 
-    # opp_occupied.each { |bait_space| piece.moves.delete_if { |bait_space| opp_moves.include?(bait_space) } }
+    opp_occupied.each do |check_if_bait|
+      piece_temp_removed = @board.retrieve_square(check_if_bait).occupied_by
+      @board.retrieve_square(check_if_bait).occupied_by = nil
+      bait_spaces << check_if_bait if king_in_check?(piece, check_if_bait)
+      @board.retrieve_square(check_if_bait).occupied_by = piece_temp_removed
+    end
 
-    piece.moves.delete_if { |move| opp_moves.include?(move) || own_occupied.include?(move) }
+
+    piece.moves.delete_if { |move| king_in_check?(piece, move) || own_occupied.include?(move) || bait_spaces.include?(move)}
+    
     @analyzing_king_moveset = false
   end
 
@@ -387,19 +380,10 @@ end
 
 game = Game.new
 game.create_players
-game.god_move_piece('E1', 'E3')
+game.god_move_piece('E1', 'D3')
 game.god_move_piece('D7', 'D4')
-game.god_move_piece('A8', 'C4')
+game.god_move_piece('A8', 'F4')
+# game.god_move_piece('C8', 'D4')
 
-game.turn
-
-p game.white_king
-puts ''
-p game.king_in_check?(game.white_king, game.white_king.current_square)
-
-game.turn
-p game.king_in_check?(game.white_king, game.white_king.current_square)
-game.turn
-p game.king_in_check?(game.white_king, game.white_king.current_square)
 game.turn
 p game.king_in_check?(game.white_king, game.white_king.current_square)
