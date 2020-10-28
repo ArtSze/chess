@@ -192,50 +192,48 @@ class Game
   end
 
   def pawn_diag(piece)
+    column = piece.current_square.first.ord
+    row = piece.current_square.last.to_i
+
     if piece.color == 'black'
       to_process = []
-      if piece.valid_space([piece.current_square.first.ord - 1, piece.current_square.last.to_i - 1])
-        to_process << [(piece.current_square.first.ord - 1).chr, (piece.current_square.last.to_i - 1).to_s]
-      elsif piece.valid_space([piece.current_square.first.ord + 1, piece.current_square.last.to_i - 1]) 
-        to_process << [(piece.current_square.first.ord + 1).chr, (piece.current_square.last.to_i - 1).to_s]
-      end 
-      if @analyzing_king_moveset == false
-        to_process.each do |square|
-          if @board.retrieve_square(square).occupied_by != nil
-            piece.moves << square if @board.retrieve_square(square).occupied_by.color == 'white'
+      
+      to_process << [(column - 1).chr, (row - 1).to_s] if piece.valid_space([column - 1, row - 1])
+      to_process << [(column + 1).chr, (row - 1).to_s] if piece.valid_space([column + 1, row - 1])  
+      
+      to_process.each do |square|
+        if @analyzing_king_moveset == true
+          piece.moves << square
+        else
+          if @board.retrieve_square(square).occupied_by != nil && @board.retrieve_square(square).occupied_by.color == 'white'
+            piece.moves << square 
           end
         end
-      elsif @analyzing_king_moveset == true
-        to_process.each do |square|
-          piece.moves << square 
-        end 
-      end
-
+      end 
+      
     elsif piece.color == 'white'
       to_process = []
-      if piece.valid_space([piece.current_square.first.ord - 1, piece.current_square.last.to_i + 1])
-        to_process << [(piece.current_square.first.ord - 1).chr, (piece.current_square.last.to_i + 1).to_s] 
-      elsif piece.valid_space([piece.current_square.first.ord + 1, piece.current_square.last.to_i + 1])
-        to_process << [(piece.current_square.first.ord + 1).chr, (piece.current_square.last.to_i + 1).to_s] 
-      end
-      if @analyzing_king_moveset == false
-        to_process.each do |square|
-          if @board.retrieve_square(square).occupied_by != nil
-            piece.moves << square if @board.retrieve_square(square).occupied_by.color == 'black'
+      
+      to_process << [(column - 1).chr, (row + 1).to_s] if piece.valid_space([column - 1, row + 1])
+      to_process << [(column + 1).chr, (row + 1).to_s] if piece.valid_space([column + 1, row + 1])
+      
+      to_process.each do |square|
+        if @analyzing_king_moveset == true
+          piece.moves << square
+        else
+          if @board.retrieve_square(square).occupied_by != nil && @board.retrieve_square(square).occupied_by.color == 'black'
+            piece.moves << square 
           end
         end
-      elsif @analyzing_king_moveset == true
-        to_process.each do |square|
-          piece.moves << square 
-        end
-      end
+      end 
     end
   end
 
-  def king_viable_moves(piece) 
-    opp_pieces, opp_moves = [], []
+  def king_viable_moves(piece) #incorporate king_in_check? to see if any hypothetical moves would put it in check... remove those from @moves if so
     @analyzing_king_moveset = true
+    opp_pieces, opp_moves = [], []
     piece.color == 'black' ? @white_pieces_in_play.each { |piece| opp_pieces << piece } : @black_pieces_in_play.each { |piece| opp_pieces << piece }
+    
     opp_pieces.each do |opp_piece| 
       if opp_piece.type == 'pawn' 
         pawn_diag(opp_piece) 
@@ -250,13 +248,34 @@ class Game
 
     piece.create_moves
 
-    #removes moves that would put king in check if he were to take opp piece
+    #flawed because you only want to remove moves if the bait space is in the move_set of another opp piece
     immediate_surroundings = piece.moves
-    occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color != piece.color }
-    occupied.each { |bait_space| piece.moves.delete_if { |move| move == bait_space } }
+    opp_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color != piece.color }
+    own_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color == piece.color }
 
-    piece.moves.delete_if { |move| opp_moves.include?(move) }
+    # opp_occupied.each { |bait_space| piece.moves.delete_if { |bait_space| opp_moves.include?(bait_space) } }
+
+    piece.moves.delete_if { |move| opp_moves.include?(move) || own_occupied.include?(move) }
     @analyzing_king_moveset = false
+  end
+
+  def king_in_check?(piece, square)
+    opp_pieces, opp_moves = [], []
+    piece.color == 'black' ? @white_pieces_in_play.each { |piece| opp_pieces << piece } : @black_pieces_in_play.each { |piece| opp_pieces << piece }
+    
+    opp_pieces.each do |opp_piece| 
+      if opp_piece.type == "pawn" 
+        pawn_diag(opp_piece) 
+      else 
+        opp_piece.create_moves 
+        check_path(opp_piece)
+      end
+      opp_piece.moves.each do |move| 
+        opp_moves << move 
+      end
+    end
+
+    opp_moves.include?(square) ? true : false
   end
 
   def turn
@@ -299,10 +318,12 @@ class Game
   def player_move_piece(start)
     first_square = @board.retrieve_square(start)
     piece = first_square.occupied_by
+    piece.moves.clear
     all_move_options(piece)
     @board.show_path(piece)
     draw_board
     co_ords = []
+    
     loop do
       puts "\nwhere would you like to move to?"
       choice = gets.chomp.strip.upcase
@@ -321,9 +342,12 @@ class Game
         @white_pieces_in_play.delete(second_square.occupied_by)
       end
     end
+
     second_square.occupied_by = piece
-    piece.current_square = second_square
+    piece.current_square = second_square.co_ord
     first_square.occupied_by = nil
+    piece.moves.clear
+    p piece
   end
 
   def god_move_piece(start, destination)
@@ -335,19 +359,14 @@ class Game
     piece.current_square = second_square.co_ord
   end
 
-  # def king_in_check?(piece) #shitty logic... but somthing along these lines
-  #   king_viable_moves(piece)
-  #   piece.moves.length == 0 & current square is member of opp piece's moves ? true : false
-  # end
-
   def draw_board
-    clear_terminal
+    # clear_terminal
     @board.draw
   end
 
   def reset_board
     @board.clear_illumination
-    clear_terminal
+    # clear_terminal
     @board.draw
   end
 
@@ -368,7 +387,19 @@ end
 
 game = Game.new
 game.create_players
-game.god_move_piece('E1', 'G5')
-game.god_move_piece('A8', 'F4')
+game.god_move_piece('E1', 'E3')
+game.god_move_piece('D7', 'D4')
+game.god_move_piece('A8', 'C4')
+
 game.turn
-# p game.king_in_check?(game.white_king)
+
+p game.white_king
+puts ''
+p game.king_in_check?(game.white_king, game.white_king.current_square)
+
+game.turn
+p game.king_in_check?(game.white_king, game.white_king.current_square)
+game.turn
+p game.king_in_check?(game.white_king, game.white_king.current_square)
+game.turn
+p game.king_in_check?(game.white_king, game.white_king.current_square)

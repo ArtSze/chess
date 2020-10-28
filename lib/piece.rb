@@ -29,13 +29,17 @@ class Piece
     x = @current_square.first.ord
     y = @current_square.last.to_i
     @type == 'pawn' ? key = [self.color, self.type].join('_').to_sym : key = self.type.to_sym 
+    
     move_set = MOVE_SETS.fetch(key)
+    opts = []
+    move_set.each { |move| opts << move }
+  
     if @type == 'pawn'
-      move_set << [0, 2] if self.at_origin? && self.color == 'white'
-      move_set << [0, -2] if self.at_origin? && self.color == 'black'
+      opts << [0, 2] if self.at_origin? && self.color == 'white'
+      opts << [0, -2] if self.at_origin? && self.color == 'black'
     end
 
-    move_set.map { |move| @moves << [(move.first + x).chr, (move.last + y).to_s] if valid_space([(move.first + x), (move.last + y)]) }
+    opts.each { |move| @moves << [(move.first + x).chr, (move.last + y).to_s] if valid_space([(move.first + x), (move.last + y)]) }
   end
 
   def to_s
