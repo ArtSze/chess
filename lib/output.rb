@@ -14,6 +14,8 @@ module Output
     white_king: "\u{265A} "
   }
 
+  SAVE_PROMPT = "You may also save the game and exit at this stage simply by typing 'save'" 
+
   def clear_terminal
     system 'clear'
   end

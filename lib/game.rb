@@ -1,18 +1,12 @@
 files = ['board', 'square', 'output', 'move_sets', 'piece', 'knight', 'pawn', 'rook', 'queen', 'king', 'bishop']
 files.each { |file| require_relative file }
+require 'yaml'
 
 class Game
   include Output
 
   attr_reader :board
-  attr_accessor :white_pieces_in_play, :black_pieces_in_play, :white_king, :black_king
-
-  def initialize
-    @board = Board.new
-    @white_pieces_in_play = []
-    @black_pieces_in_play = []
-    populate_board
-  end
+  attr_accessor :white_pieces_in_play, :black_pieces_in_play, :white_king, :black_king, :player_one, :player_two, :active_player, :active_king, :verify_for_choice, :analyzing_king_moveset
 
   Player = Struct.new(:name, :color)
 
@@ -20,6 +14,7 @@ class Game
     @player_one = Player.new(get_name(1), 'white')
     @player_two = Player.new(get_name(2), 'black')
     @active_player = @player_two #initializes as P2 so that it switches to P1 on initial turn
+    @active_king = @black_king
   end
 
   def get_name(player_num)
@@ -78,6 +73,87 @@ class Game
 
   def switch_player
     @active_player == @player_one ? @active_player = @player_two : @active_player = @player_one
+  end
+
+  def all_move_options(piece)
+    if piece.type == 'king'
+      king_viable_moves(piece) 
+    else
+      piece.create_moves
+      pawn_diag(piece) if piece.type == 'pawn'
+      check_path(piece)
+    end
+  end
+
+  def king_viable_moves(piece) 
+    @analyzing_king_moveset = true
+    bait_spaces, unsafe_empties  = [], []
+
+    piece.create_moves
+
+    immediate_surroundings = piece.moves
+    own_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color == piece.color }
+    opp_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color != piece.color }
+    empty_spaces = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by == nil }
+
+    opp_occupied.each do |check_if_bait|
+      king_space = piece.current_square
+      piece_temp_removed = @board.retrieve_square(check_if_bait).occupied_by
+      @board.retrieve_square(check_if_bait).occupied_by = nil
+      @board.retrieve_square(king_space).occupied_by = nil
+      bait_spaces << check_if_bait if king_in_check?(piece, check_if_bait)
+      @board.retrieve_square(check_if_bait).occupied_by = piece_temp_removed
+      @board.retrieve_square(king_space).occupied_by = piece
+    end
+
+    empty_spaces.each do |empty_to_check|
+      king_space = piece.current_square
+      @board.retrieve_square(king_space).occupied_by = nil
+      unsafe_empties << empty_to_check if king_in_check?(piece, empty_to_check)
+      @board.retrieve_square(king_space).occupied_by = piece
+    end
+
+    piece.moves.delete_if { |move| unsafe_empties.include?(move) || own_occupied.include?(move) || bait_spaces.include?(move)}
+    
+    @analyzing_king_moveset = false
+  end
+
+  def pawn_diag(piece)
+    column = piece.current_square.first.ord
+    row = piece.current_square.last.to_i
+
+    if piece.color == 'black'
+      to_process = []
+      
+      to_process << [(column - 1).chr, (row - 1).to_s] if piece.valid_space([column - 1, row - 1])
+      to_process << [(column + 1).chr, (row - 1).to_s] if piece.valid_space([column + 1, row - 1])  
+      
+      to_process.each do |square|
+        if @analyzing_king_moveset == true
+          piece.moves << square
+        else
+          if @board.retrieve_square(square).occupied_by != nil && @board.retrieve_square(square).occupied_by.color == 'white'
+            piece.moves << square 
+          end
+        end
+      end 
+      
+    elsif piece.color == 'white'
+      to_process = []
+      
+      to_process << [(column - 1).chr, (row + 1).to_s] if piece.valid_space([column - 1, row + 1])
+      to_process << [(column + 1).chr, (row + 1).to_s] if piece.valid_space([column + 1, row + 1])
+      
+      to_process.each do |square|
+        if @analyzing_king_moveset == true
+          piece.moves << square
+        else
+          if @board.retrieve_square(square).occupied_by != nil && @board.retrieve_square(square).occupied_by.color == 'black'
+            piece.moves << square 
+          end
+        end
+      end 
+    end
   end
 
   def check_path(piece)
@@ -191,120 +267,47 @@ class Game
     end
   end
 
-  def pawn_diag(piece)
-    column = piece.current_square.first.ord
-    row = piece.current_square.last.to_i
-
-    if piece.color == 'black'
-      to_process = []
-      
-      to_process << [(column - 1).chr, (row - 1).to_s] if piece.valid_space([column - 1, row - 1])
-      to_process << [(column + 1).chr, (row - 1).to_s] if piece.valid_space([column + 1, row - 1])  
-      
-      to_process.each do |square|
-        if @analyzing_king_moveset == true
-          piece.moves << square
-        else
-          if @board.retrieve_square(square).occupied_by != nil && @board.retrieve_square(square).occupied_by.color == 'white'
-            piece.moves << square 
-          end
-        end
-      end 
-      
-    elsif piece.color == 'white'
-      to_process = []
-      
-      to_process << [(column - 1).chr, (row + 1).to_s] if piece.valid_space([column - 1, row + 1])
-      to_process << [(column + 1).chr, (row + 1).to_s] if piece.valid_space([column + 1, row + 1])
-      
-      to_process.each do |square|
-        if @analyzing_king_moveset == true
-          piece.moves << square
-        else
-          if @board.retrieve_square(square).occupied_by != nil && @board.retrieve_square(square).occupied_by.color == 'black'
-            piece.moves << square 
-          end
-        end
-      end 
-    end
-  end
-
-  def king_viable_moves(piece) 
-    @analyzing_king_moveset = true
-    bait_spaces, unsafe_empties  = [], []
-
-    piece.create_moves
-
-    immediate_surroundings = piece.moves
-    own_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color == piece.color }
-    opp_occupied = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by != nil && @board.retrieve_square(move).occupied_by.color != piece.color }
-    empty_spaces = immediate_surroundings.select { |move| @board.retrieve_square(move).occupied_by == nil }
-
-    opp_occupied.each do |check_if_bait|
-      king_space = piece.current_square
-      piece_temp_removed = @board.retrieve_square(check_if_bait).occupied_by
-      @board.retrieve_square(check_if_bait).occupied_by = nil
-      @board.retrieve_square(king_space).occupied_by = nil
-      bait_spaces << check_if_bait if king_in_check?(piece, check_if_bait)
-      @board.retrieve_square(check_if_bait).occupied_by = piece_temp_removed
-      @board.retrieve_square(king_space).occupied_by = piece
-    end
-
-    empty_spaces.each do |empty_to_check|
-      king_space = piece.current_square
-      @board.retrieve_square(king_space).occupied_by = nil
-      unsafe_empties << empty_to_check if king_in_check?(piece, empty_to_check)
-      @board.retrieve_square(king_space).occupied_by = piece
-    end
-
-    piece.moves.delete_if { |move| unsafe_empties.include?(move) || own_occupied.include?(move) || bait_spaces.include?(move)}
-    
-    @analyzing_king_moveset = false
-  end
-
-  def king_in_check?(piece, square)
-    opp_pieces, opp_moves = [], []
-    piece.color == 'black' ? @white_pieces_in_play.each { |piece| opp_pieces << piece } : @black_pieces_in_play.each { |piece| opp_pieces << piece }
-    
-    opp_pieces.each do |opp_piece| 
-      if opp_piece.type == "pawn" 
-        pawn_diag(opp_piece) 
-      else 
-        opp_piece.create_moves 
-        check_path(opp_piece)
-      end
-      opp_piece.moves.each do |move| 
-        opp_moves << move 
-      end
-    end
-
-    opp_moves.include?(square) ? true : false
-  end
-
-  def check_mate?(king)
-    king_viable_moves(king)
-    (king_in_check?(king, king.current_square) && king.moves.length == 0) ? king : false
-  end
-
-  def turn
-    switch_player
-    @active_player == @player_one ? @active_king = @white_king : @active_king = @black_king
-    reset_board
-    player_move_piece(choose_piece)
-    reset_board
-  end
-
-  def choose_piece
+  def choose_piece 
+    save_trigger = /SAVE/i
     if king_in_check?(@active_king, @active_king.current_square)
-      puts "\nYou must move your king because he is in check."
-      return @active_king.current_square
-    end
-    loop do
-      puts "\n#{@active_player.color.upcase}'s turn: Which piece would you like to move #{@active_player.name}? (enter its current square e.g. 'A2')" 
-      choice = gets.chomp.strip.upcase
-      break choice if valid_choice?(choice) && piece_has_moves?(choice)
-      clear_line_above
-      puts "\nPlease enter a valid square... (column letter followed by row number)".red
+      @verify_for_choice = true
+      pieces_checking_king = king_in_check?(@active_king, @active_king.current_square)
+      @verify_for_choice = false
+      opp_piece_squares, own_pieces, defensive_choices = [], [], []
+      pieces_checking_king.each { |opp_piece_checking_king| opp_piece_squares << opp_piece_checking_king.current_square}
+      @active_player.color == 'black' ? @black_pieces_in_play.each { |piece| own_pieces << piece } : @white_pieces_in_play.each { |piece| own_pieces << piece }
+      own_pieces.each do |piece|
+        all_move_options(piece)
+        piece.moves.each do |move|
+          defensive_choices << piece.current_square if opp_piece_squares.include?(move)
+        end
+      end
+      defensive_choices << @active_king.current_square if piece_has_moves?(@active_king.current_square)
+      puts "\n#{@active_player.color.upcase}'s turn..."
+      loop do
+        puts "Your king is in check. Either move him to safety or eliminate the threat."
+        puts "Which piece would you like to move #{@active_player.name}? (enter its current square e.g. 'A2')"
+        puts "#{SAVE_PROMPT}".blue
+        puts "" 
+        choice = gets.chomp.strip.upcase
+        formatted_choice = []
+        formatted_choice << choice[0]
+        formatted_choice << choice[1]
+        self.save_game if save_trigger.match(choice)
+        break choice if defensive_choices.include?(formatted_choice) 
+        puts "You must choose a piece that either takes the opponent's piece putting your king in check... or move the king himself."
+      end
+    else
+      loop do
+        puts "\n#{@active_player.color.upcase}'s turn: Which piece would you like to move #{@active_player.name}? (enter its current square e.g. 'A2')"
+        puts "#{SAVE_PROMPT}".blue
+        puts "" 
+        choice = gets.chomp.strip.upcase
+        self.save_game if save_trigger.match(choice)
+        break choice if valid_choice?(choice) && piece_has_moves?(choice)
+        clear_line_above
+        puts "\nPlease enter a valid square... (column letter followed by row number)".red
+      end
     end
   end 
 
@@ -316,16 +319,6 @@ class Game
     piece = @board.retrieve_square(choice).occupied_by
     all_move_options(piece)
     piece.moves.length > 0 ? true : false
-  end
-
-  def all_move_options(piece)
-    if piece.type == 'king'
-      king_viable_moves(piece) 
-    else
-      piece.create_moves
-      pawn_diag(piece) if piece.type == 'pawn'
-      check_path(piece)
-    end
   end
 
   def player_move_piece(start)
@@ -360,7 +353,7 @@ class Game
     piece.current_square = second_square.co_ord
     first_square.occupied_by = nil
     piece.moves.clear
-    p piece
+    
   end
 
   def god_move_piece(start, destination)
@@ -372,14 +365,75 @@ class Game
     piece.current_square = second_square.co_ord
   end
 
+  def king_in_check?(piece, square)
+    opp_pieces, opp_moves, pieces_checking_king = [], [], []
+    piece.color == 'black' ? @white_pieces_in_play.each { |piece| opp_pieces << piece } : @black_pieces_in_play.each { |piece| opp_pieces << piece }
+    
+    opp_pieces.each do |opp_piece| 
+      if opp_piece.type == "pawn" 
+        pawn_diag(opp_piece) 
+      else 
+        opp_piece.create_moves 
+        check_path(opp_piece)
+      end
+      opp_piece.moves.each do |move| 
+        if @verify_for_choice == true
+          pieces_checking_king << opp_piece if move == square
+        else
+          opp_moves << move 
+        end
+      end
+    end
+
+    if @verify_for_choice == true
+      pieces_checking_king
+    else
+      opp_moves.include?(square) ? true : false
+    end
+  end
+
+  def check_mate?(king) 
+    king_viable_moves(king)
+    (king_in_check?(king, king.current_square) || king.at_origin? == false) && king.moves.length == 0 ? false : false
+  end
+
+  def play
+    start
+    turn until check_mate?(@active_king) != false
+  end
+
+  def turn
+    switch_player
+    @active_player == @player_one ? @active_king = @white_king : @active_king = @black_king
+    reset_board
+    return end_game if check_mate?(@active_king)
+    player_move_piece(choose_piece)
+    reset_board
+    clear_all_moves
+  end
+
+  def end_game
+    puts "\n#{@active_player.name} loses!" 
+    puts "Play again? (Y/N)"
+    valid_yes_responses = ["y", "yes", "yup", "yeah"]
+    valid_no_responses = ["n", "no", "nope", "nah"]
+    response = gets.chomp.downcase
+    until valid_yes_responses.any? { |option| option == response } || valid_no_responses.any? { |option| option == response }
+      puts "\nPlay again?  (Y/N)"
+      response = gets.chomp.downcase
+      puts "\n"
+    end
+    Game.new.play if valid_yes_responses.any? { |option| option == response }
+  end
+
   def draw_board
-    # clear_terminal
+    clear_terminal
     @board.draw
   end
 
   def reset_board
     @board.clear_illumination
-    # clear_terminal
+    clear_terminal
     @board.draw
   end
 
@@ -389,22 +443,66 @@ class Game
     all_pieces.each { |piece| piece.moves.clear }
   end
 
+  def start
+    clear_terminal
+    puts "\nWelcome to Chess. Hopefully you already know how to play!"
+    puts "\nWould you like to start a new game or load the most recent game? (new/load)"
+    input = gets.chomp.strip.gsub(" ", "").downcase
+    case input
+    when "new"
+      self.game_from_scratch
+    when "load"
+      self.load_game
+    end
+  end
+
+  def game_from_scratch
+    @board = Board.new
+    @white_pieces_in_play = []
+    @black_pieces_in_play = []
+    populate_board
+    create_players
+  end
+
+  def load_game
+    most_recent_game = Dir[File.join("saved_games", '*')].max_by(&File.method(:ctime))
+    game = YAML.load(File.open(most_recent_game))
+    @board = game.board
+    @player_one = game.player_one
+    @player_two = game.player_two
+    @white_pieces_in_play = game.white_pieces_in_play
+    @black_pieces_in_play = game.black_pieces_in_play
+    @white_king = game.white_king
+    @black_king = game.black_king
+    @active_player = game.active_player
+    @active_king = game.active_king
+    @verify_for_choice = game.verify_for_choice
+    @analyzing_king_moveset = game.analyzing_king_moveset
+    switch_player
+  end
+
+  def save_game
+    puts "\ncurrently saving..."
+    current_game = self
+    @serialized_game = YAML::dump(current_game)
+    current_time = Time.now.getlocal('-04:00') 
+    Dir.mkdir("saved_games") unless Dir.exists? "saved_games"
+    filename = "saved_games/#{current_time.mon}_#{current_time.day}_#{current_time.hour}h#{current_time.min}m"
+    File.open(filename, 'w') { |file| file.puts @serialized_game}
+    sleep(1)
+    puts "saved!"
+    exit
+  end
+
   # en_passant method
   # pawn must be at origin
   # pawn must move two squares ahead to a square where an opp pawn is on an adjacent square(left or right) 
   # opp pawn can move diagonally to square beyond OG pawn, taking OG pawn in the process...
   # MUST be done immediately after OG pawn moves two squares... otherwise that pawn cannot be taken en-passant
 
+  # promote method
+
+  # castling method
 end
   
-
-game = Game.new
-game.create_players
-game.god_move_piece('E1', 'D4')
-game.god_move_piece('H8', 'E4')
-game.god_move_piece('A8', 'B5')
-# game.god_move_piece('C8', 'D4')
-
-game.turn
-p game.king_in_check?(game.white_king, game.white_king.current_square)
-puts game.check_mate?(game.white_king)
+Game.new.play
