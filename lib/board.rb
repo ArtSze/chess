@@ -27,7 +27,7 @@ class Board
     for i in 8.downto(1)
       draw_row(i)
     end
-    puts "  A B C D E F G H "
+    puts "   A  B  C  D  E  F  G  H "
   end
 
   def draw_row(row_num)

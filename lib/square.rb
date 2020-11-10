@@ -12,11 +12,10 @@ class Square
     @illuminated = false
   end
 
-  # need to somehow change red illumination to only work if it's opponent's piece... illimunated boolean in board class 
   def string
-    contents = @occupied_by.nil? ? "  " : @occupied_by.to_s 
+    contents = @occupied_by.nil? ? "   " : @occupied_by.to_s 
     if @illuminated == true 
-      contents == "  " ? contents.colorize( :background => :green) : contents.colorize( :background => :red)
+      contents == "   " ? contents.colorize( :background => :green) : contents.colorize( :background => :red)
     else
       @bg_color == "white" ? contents.colorize( :background => :light_black) : contents.colorize( :background => :black)
     end

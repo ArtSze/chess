@@ -22,7 +22,7 @@ class Piece
   end
 
   def valid_space(position)
-    position.first.between?(65, 72) && position.last.between?(1, 8) ? true : false
+    position[0].between?(65, 72) && position[1].between?(1, 8) ? true : false
   end
 
   def create_moves
@@ -45,7 +45,7 @@ class Piece
   def to_s
     key = [self.color, self.type].join('_').to_sym
     image = IMAGES.fetch(key)
-    "#{image}"
+    " #{image}"
   end
 
 end

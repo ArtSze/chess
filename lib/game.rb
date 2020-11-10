@@ -6,7 +6,7 @@ class Game
   include Output
 
   attr_reader :board
-  attr_accessor :white_pieces_in_play, :black_pieces_in_play, :white_king, :black_king, :player_one, :player_two, :active_player, :active_king, :verify_for_choice, :analyzing_king_moveset
+  attr_accessor :white_pieces_in_play, :black_pieces_in_play, :white_king, :black_king, :player_one, :player_two, :active_player, :active_king, :verify_for_choice, :analyzing_king_moveset, :en_passant_pieces
 
   Player = Struct.new(:name, :color)
 
@@ -69,6 +69,7 @@ class Game
     end
     @white_king = @white_pieces_in_play.select { |piece| piece.type == 'king' }.first
     @black_king = @black_pieces_in_play.select { |piece| piece.type == 'king' }.first
+    @en_passant_pieces = []
   end
 
   def switch_player
@@ -80,8 +81,17 @@ class Game
       king_viable_moves(piece) 
     else
       piece.create_moves
-      pawn_diag(piece) if piece.type == 'pawn'
+      if piece.type == 'pawn'
+        pawn_diag(piece)
+        if @en_passant_pieces.length > 0 #if en_passant conditions exist... adds square on diagonal to move_set
+          piece.color == 'white' ? row_change = 1 : row_change = -1
+          @en_passant_pieces.each do |piece_and_move|
+            en_passant_destination_row = (piece_and_move.last.last.to_i + row_change).to_s
+            piece.moves << [piece_and_move.last.first, en_passant_destination_row] if piece_and_move.first == piece
+          end
+        end
       check_path(piece)
+      end
     end
   end
 
@@ -347,11 +357,25 @@ class Game
       elsif @active_player.color == 'black'
         @white_pieces_in_play.delete(second_square.occupied_by)
       end
+    else
+      if piece.type == 'pawn' && ((co_ords.first.ord - start[0].ord).abs == 1) # post en_passant move clears square behind destination
+        @active_player.color == 'white' ? row_behind = -1 : row_behind = 1
+        square_taken_en_passant = @board.retrieve_square([co_ords.first, ((co_ords.last.to_i + row_behind).to_s)])
+        square_taken_en_passant.occupied_by = nil
+      end
+      second_square.occupied_by = piece
+      piece.current_square = second_square.co_ord
+      first_square.occupied_by = nil
+      @en_passant_pieces.clear
     end
 
-    second_square.occupied_by = piece
-    piece.current_square = second_square.co_ord
-    first_square.occupied_by = nil
+    if piece.type == 'pawn'
+      verify_promotion(piece)
+      if (first_square.co_ord.last.to_i - second_square.co_ord.last.to_i).abs == 2 #triggers en_passant (pawn advances two squares)
+        verify_en_passant(piece) 
+      end
+    end
+
     piece.moves.clear
     
   end
@@ -427,13 +451,13 @@ class Game
   end
 
   def draw_board
-    clear_terminal
+    # clear_terminal
     @board.draw
   end
 
   def reset_board
     @board.clear_illumination
-    clear_terminal
+    # clear_terminal
     @board.draw
   end
 
@@ -478,6 +502,7 @@ class Game
     @active_king = game.active_king
     @verify_for_choice = game.verify_for_choice
     @analyzing_king_moveset = game.analyzing_king_moveset
+    @en_passant_pieces = game.en_passant_pieces
     switch_player
   end
 
@@ -494,13 +519,59 @@ class Game
     exit
   end
 
-  # en_passant method
-  # pawn must be at origin
-  # pawn must move two squares ahead to a square where an opp pawn is on an adjacent square(left or right) 
-  # opp pawn can move diagonally to square beyond OG pawn, taking OG pawn in the process...
-  # MUST be done immediately after OG pawn moves two squares... otherwise that pawn cannot be taken en-passant
+  def verify_promotion(pawn)
+    color = pawn.color
+    color == 'white' ? promotion_row = '8' : promotion_row = '1'
+    promote(pawn) if pawn.current_square.last == promotion_row 
+  end
 
-  # promote method
+  def promote(pawn)
+    current_square = @board.retrieve_square(pawn.current_square)
+    color = pawn.color
+    color == 'white' ? @white_pieces_in_play.delete(pawn) : @black_pieces_in_play.delete(pawn)
+    current_square.occupied_by = nil
+    choice = get_promotion_choice
+    case choice
+    when "K"
+      current_square.occupied_by = Knight.new(color, current_square.co_ord) 
+    when "Q"
+      current_square.occupied_by = Queen.new(color, current_square.co_ord) 
+    when "R"
+      current_square.occupied_by = Rook.new(color, current_square.co_ord) 
+    when "B"
+      current_square.occupied_by = Bishop.new(color, current_square.co_ord) 
+    end
+    color == 'white' ? @white_pieces_in_play << current_square.occupied_by : @black_pieces_in_play << current_square.occupied_by
+  end
+
+  def get_promotion_choice
+    promotion_choices = ["K", "Q", "R", "B"]
+    loop do
+      puts "\nYou can promote your pawn... what kind of piece would you like to promote it to?"
+      puts "(K)night (Q)ueen (R)ook (B)ishop ?"
+      choice = gets.chomp.strip.upcase
+      break choice if promotion_choices.include?(choice)
+      clear_line_above
+      puts "\nPlease enter a valid piece"
+    end
+  end
+
+  def verify_en_passant(piece) #checks adjacent square for en_passant & adds to array for later processing
+    column = piece.current_square.first.ord
+    row = piece.current_square.last
+    c_to_left = (column - 1).chr
+    c_to_right = (column + 1).chr
+    left_square = @board.retrieve_square([c_to_left, row])
+    right_square = @board.retrieve_square([c_to_right, row])
+    [left_square, right_square].each do |square|
+      if square != nil && square.occupied_by != nil
+        if square.occupied_by.type == 'pawn' && square.occupied_by.color != piece.color
+          @en_passant_pieces << [square.occupied_by, piece.current_square]
+        end
+      end
+    end
+  
+  end
 
   # castling method
 end
