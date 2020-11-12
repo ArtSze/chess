@@ -427,7 +427,7 @@ class Game
 
   def check_mate?(king) 
     king_viable_moves(king)
-    (king_in_check?(king, king.current_square) || king.at_origin? == false) && king.moves.length == 0 ? false : false
+    (king_in_check?(king, king.current_square) || king.at_origin? == false) && king.moves.length == 0 ? true : false
   end
 
   def play
@@ -488,7 +488,7 @@ class Game
 
   def start
     clear_terminal
-    puts "\nWelcome to Chess. Hopefully you already know how to play!"
+    title_art
     puts "\nWould you like to start a new game or load the most recent game? (new/load)"
     input = gets.chomp.strip.gsub(" ", "").downcase
     case input
@@ -655,3 +655,10 @@ class Game
 end
   
 Game.new.play
+
+#refactor input prompts to work recursively
+#add ability to choose savefile when loading (display all files within saved_games folder)
+
+#observer design pattern to help reduce load when verifying check?, castling, or en_passant conditions
+#linked_list structure for bishop, rook, queen? (next until !square.occupied_by.nil?)
+#memoization to prevent recalculation of unchanged board states?

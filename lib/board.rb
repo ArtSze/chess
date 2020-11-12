@@ -24,6 +24,7 @@ class Board
 
   def draw
     puts "\n"
+    puts "   A  B  C  D  E  F  G  H "
     for i in 8.downto(1)
       draw_row(i)
     end
@@ -34,6 +35,7 @@ class Board
     row = @squares.select{ |square| square.co_ord.last == row_num.to_s }
     print "#{row_num} "
     row.each { |square| print square.string}
+    print " #{row_num}"
     puts
   end
 

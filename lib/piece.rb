@@ -47,5 +47,4 @@ class Piece
     image = IMAGES.fetch(key)
     " #{image}"
   end
-
 end
