@@ -283,7 +283,6 @@ class Game
   end
 
   def choose_piece 
-    save_trigger = /SAVE/i
     if king_in_check?(@active_king, @active_king.current_square)
       @verify_for_choice = true
       pieces_checking_king = king_in_check?(@active_king, @active_king.current_square)
@@ -298,7 +297,6 @@ class Game
         end
       end
       defensive_choices << @active_king.current_square if piece_has_moves?(@active_king.current_square)
-      puts "\n#{@active_player.color.upcase}'s turn..."
       loop do
         puts "Your king is in check. Either move him to safety or eliminate the threat."
         puts "Which piece would you like to move #{@active_player.name}? (enter its current square e.g. 'A2')"
@@ -308,17 +306,17 @@ class Game
         formatted_choice = []
         formatted_choice << choice[0]
         formatted_choice << choice[1]
-        self.save_game if save_trigger.match(choice)
+        self.save_game if SAVE_TRIGGER.match(choice)
         break choice if defensive_choices.include?(formatted_choice) 
         puts "You must choose a piece that either takes the opponent's piece putting your king in check... or move the king himself."
       end
     else
       loop do
-        puts "\n#{@active_player.color.upcase}'s turn: Which piece would you like to move #{@active_player.name}? (enter its current square e.g. 'A2')"
+        puts "Which piece would you like to move #{@active_player.name}? (enter its current square e.g. 'A2')"
         puts "#{SAVE_PROMPT}".blue
         puts "" 
         choice = gets.chomp.strip.upcase
-        self.save_game if save_trigger.match(choice)
+        self.save_game if SAVE_TRIGGER.match(choice)
         break choice if valid_choice?(choice) && piece_has_moves?(choice)
         clear_line_above
         puts "\nPlease enter a valid square... (column letter followed by row number)".red
@@ -362,11 +360,17 @@ class Game
       elsif @active_player.color == 'black'
         @white_pieces_in_play.delete(second_square.occupied_by)
       end
+      second_square.occupied_by = piece
+      piece.current_square = second_square.co_ord
+      first_square.occupied_by = nil
+      @en_passant_pieces.clear
     else
       if piece.type == 'pawn' && ((co_ords.first.ord - start[0].ord).abs == 1) # post en_passant move clears square behind destination
         @active_player.color == 'white' ? row_behind = -1 : row_behind = 1
         square_taken_en_passant = @board.retrieve_square([co_ords.first, ((co_ords.last.to_i + row_behind).to_s)])
         square_taken_en_passant.occupied_by = nil
+        @black_pieces_in_play.delete(square_taken_en_passant.occupied_by) if @active_player.color == 'white'
+        @white_pieces_in_play.delete(square_taken_en_passant.occupied_by) if @active_player.color == 'black'
       end
       second_square.occupied_by = piece
       piece.current_square = second_square.co_ord
@@ -436,15 +440,17 @@ class Game
     switch_king
     reset_board
     return end_game if check_mate?(@active_king)
-    p castling_possible?(@active_player)
-    player_move_piece(choose_piece)
-    # if castling_possible?(@active_player)
-    #   if castling_prompt == true
-    #     castle
-    #   else
-    #     player_move_piece(choose_piece)
-    #   end
-    # end
+    puts "\n#{@active_player.color.upcase}'s turn:"
+    if castling_possible?(@active_player)
+      if execute_castle == "Y" 
+        castle
+      else 
+        4.times{ clear_line_above }
+        player_move_piece(choose_piece) 
+      end
+    else
+      player_move_piece(choose_piece)
+    end
     reset_board
     clear_all_moves
   end
@@ -589,16 +595,19 @@ class Game
 
   def castling_possible?(player)
     group = @active_player.color == 'white' ? @white_pieces_in_play : @black_pieces_in_play
-    left_rook = group.select { |piece| piece.type == 'rook' && piece.current_square[0] == 'A' }[0]
-    right_rook = group.select { |piece| piece.type == 'rook' && piece.current_square[0] == 'H' }[0]
+    left_rook = group.select { |piece| piece.type == 'rook' && piece.origin[0] == 'A' }[0]
+    right_rook = group.select { |piece| piece.type == 'rook' && piece.origin[0] == 'H' }[0]
+    valid_rooks = []
     king = @active_king
     @castle_candidates.clear if !@castle_candidates.empty?
 
-    return false if !king.at_origin? || (!left_rook.at_origin? && !right_rook.at_origin?) || king_in_check?(king, king.current_square)
+    [left_rook, right_rook].each { |rook| valid_rooks << rook if !rook.nil? && rook.alive? && rook.at_origin? }    
+
+    return false if !king.at_origin? || valid_rooks.empty? || king_in_check?(king, king.current_square)
 
     king_column = 'E'.ord
 
-    [left_rook, right_rook].each do |rook|
+    valid_rooks.each do |rook|
       range, king_column_jump = (('A'.ord + 1)..(king_column - 1)), -2 if rook == left_rook
       range, king_column_jump = ((king_column + 1)..('H'.ord - 1)), 2 if rook == right_rook
       
@@ -611,7 +620,7 @@ class Game
       end
     end
 
-    @castle_candidates.length > 0 ? true : false
+    @castle_candidates.length > 0 ? @castle_candidates : false
 
     # X  requires king and rook to be at origin
     # X  king must not be in check
@@ -620,13 +629,29 @@ class Game
     # X  destination square for king must not put him in check
   end
 
-  # def castling_prompt
-    
-  # end
+  def execute_castle
+    valid_yes = /Y/
+    valid_no = /N/
+    loop do
+      puts "Would you like to castle and move your king to #{@castle_candidates[0][0]}#{@castle_candidates[0][1]}? (Y/N)"
+      puts "If not, your turn will proceed as normal."
+      puts "#{SAVE_PROMPT}".blue
+      choice = gets.chomp.strip.upcase
+      self.save_game if SAVE_TRIGGER.match(choice)
+      break choice if valid_yes.match(choice) || valid_no.match(choice)
+      clear_line_above
+      puts "Please enter Y or N.".red
+    end
+  end
 
-  # def castle
-  #   #king moves two squares towards the rook and rook moves one past the king
-  # end
+  def castle
+    king_start = @active_king.current_square
+    king_dest = "#{@castle_candidates[0][0]}#{@castle_candidates[0][1]}"
+    rook_start = (king_dest[0].ord > king_start[0].ord) ? "H#{king_start[1]}" : "A#{king_start[1]}" 
+    rook_dest = (king_dest[0].ord > king_start[0].ord) ?  "F#{king_start[1]}" : "D#{king_start[1]}"
+    god_move_piece(king_start, king_dest)
+    god_move_piece(rook_start, rook_dest)
+  end
 end
   
 Game.new.play

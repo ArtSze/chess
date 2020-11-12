@@ -15,6 +15,7 @@ module Output
   }
 
   SAVE_PROMPT = "You may also save the game and exit at this stage simply by typing 'save'" 
+  SAVE_TRIGGER = /SAVE/i
 
   def clear_terminal
     system 'clear'
