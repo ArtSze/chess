@@ -1,0 +1,1532 @@
+--- !ruby/object:Game
+board: !ruby/object:Board
+  squares:
+  - !ruby/object:Square
+    co_ord:
+    - A
+    - '1'
+    bg_color: white
+    occupied_by: &41 !ruby/object:Rook
+      color: white
+      current_square: &1
+      - A
+      - '1'
+      moves:
+      - - B
+        - '1'
+      - - C
+        - '1'
+      - - D
+        - '1'
+      - - B
+        - '1'
+      - - C
+        - '1'
+      - - D
+        - '1'
+      type: rook
+      origin: *1
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - A
+    - '2'
+    bg_color: black
+    occupied_by: &33 !ruby/object:Pawn
+      color: white
+      current_square: &2
+      - A
+      - '2'
+      moves:
+      - - B
+        - '3'
+      type: pawn
+      origin: *2
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &3
+    - A
+    - '3'
+    bg_color: white
+    occupied_by: &43 !ruby/object:Knight
+      color: white
+      current_square: *3
+      moves:
+      - - C
+        - '4'
+      - - B
+        - '5'
+      - - B
+        - '1'
+      - - C
+        - '4'
+      - - B
+        - '5'
+      - - B
+        - '1'
+      type: knight
+      origin:
+      - B
+      - '1'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - A
+    - '4'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - A
+    - '5'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &4
+    - A
+    - '6'
+    bg_color: black
+    occupied_by: &59 !ruby/object:Knight
+      color: black
+      current_square: *4
+      moves:
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      - - C
+        - '5'
+      - - B
+        - '8'
+      - - B
+        - '4'
+      type: knight
+      origin:
+      - B
+      - '8'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - A
+    - '7'
+    bg_color: white
+    occupied_by: &49 !ruby/object:Pawn
+      color: black
+      current_square: &5
+      - A
+      - '7'
+      moves:
+      - - B
+        - '6'
+      - - B
+        - '6'
+      - - B
+        - '6'
+      - - B
+        - '6'
+      type: pawn
+      origin: *5
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - A
+    - '8'
+    bg_color: black
+    occupied_by: &57 !ruby/object:Rook
+      color: black
+      current_square: &6
+      - A
+      - '8'
+      moves:
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - D
+        - '8'
+      type: rook
+      origin: *6
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - B
+    - '1'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &7
+    - B
+    - '2'
+    bg_color: white
+    occupied_by: &45 !ruby/object:Bishop
+      color: white
+      current_square: *7
+      moves:
+      - - C
+        - '1'
+      - - C
+        - '1'
+      type: bishop
+      origin:
+      - C
+      - '1'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - B
+    - '3'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &8
+    - B
+    - '4'
+    bg_color: white
+    occupied_by: &34 !ruby/object:Pawn
+      color: white
+      current_square: *8
+      moves:
+      - - A
+        - '5'
+      - - C
+        - '5'
+      type: pawn
+      origin:
+      - B
+      - '2'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &9
+    - B
+    - '5'
+    bg_color: black
+    occupied_by: &50 !ruby/object:Pawn
+      color: black
+      current_square: *9
+      moves:
+      - - A
+        - '4'
+      - - C
+        - '4'
+      - - A
+        - '4'
+      - - C
+        - '4'
+      - - A
+        - '4'
+      - - C
+        - '4'
+      - - A
+        - '4'
+      - - C
+        - '4'
+      type: pawn
+      origin:
+      - B
+      - '7'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - B
+    - '6'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &10
+    - B
+    - '7'
+    bg_color: black
+    occupied_by: &61 !ruby/object:Bishop
+      color: black
+      current_square: *10
+      moves:
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      - - C
+        - '8'
+      type: bishop
+      origin:
+      - C
+      - '8'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - B
+    - '8'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - C
+    - '1'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &11
+    - C
+    - '2'
+    bg_color: black
+    occupied_by: &47 !ruby/object:Queen
+      color: white
+      current_square: *11
+      moves:
+      - - C
+        - '1'
+      - - B
+        - '1'
+      - - D
+        - '3'
+      - - E
+        - '4'
+      - - F
+        - '5'
+      - - G
+        - '6'
+      - - H
+        - '7'
+      - - D
+        - '1'
+      - - B
+        - '3'
+      - - A
+        - '4'
+      - - C
+        - '1'
+      - - B
+        - '1'
+      - - D
+        - '3'
+      - - E
+        - '4'
+      - - F
+        - '5'
+      - - G
+        - '6'
+      - - H
+        - '7'
+      - - D
+        - '1'
+      - - B
+        - '3'
+      - - A
+        - '4'
+      type: queen
+      origin:
+      - D
+      - '1'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &12
+    - C
+    - '3'
+    bg_color: white
+    occupied_by: &35 !ruby/object:Pawn
+      color: white
+      current_square: *12
+      moves:
+      - - B
+        - '4'
+      - - D
+        - '4'
+      type: pawn
+      origin:
+      - C
+      - '2'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - C
+    - '4'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - C
+    - '5'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &13
+    - C
+    - '6'
+    bg_color: black
+    occupied_by: &51 !ruby/object:Pawn
+      color: black
+      current_square: *13
+      moves:
+      - - B
+        - '5'
+      - - D
+        - '5'
+      - - B
+        - '5'
+      - - D
+        - '5'
+      - - B
+        - '5'
+      - - D
+        - '5'
+      - - B
+        - '5'
+      - - D
+        - '5'
+      type: pawn
+      origin:
+      - C
+      - '7'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord: &14
+    - C
+    - '7'
+    bg_color: white
+    occupied_by: &63 !ruby/object:Queen
+      color: black
+      current_square: *14
+      moves:
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      - - C
+        - '8'
+      - - A
+        - '5'
+      - - B
+        - '6'
+      - - D
+        - '8'
+      - - H
+        - '2'
+      - - G
+        - '3'
+      - - F
+        - '4'
+      - - E
+        - '5'
+      - - D
+        - '6'
+      - - B
+        - '8'
+      type: queen
+      origin:
+      - D
+      - '8'
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - C
+    - '8'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '1'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '2'
+    bg_color: white
+    occupied_by: &36 !ruby/object:Pawn
+      color: white
+      current_square: &15
+      - D
+      - '2'
+      moves:
+      - - C
+        - '3'
+      - - E
+        - '3'
+      type: pawn
+      origin: *15
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '3'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '4'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '5'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '6'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '7'
+    bg_color: black
+    occupied_by: &52 !ruby/object:Pawn
+      color: black
+      current_square: &16
+      - D
+      - '7'
+      moves:
+      - - C
+        - '6'
+      - - E
+        - '6'
+      - - C
+        - '6'
+      - - E
+        - '6'
+      - - C
+        - '6'
+      - - E
+        - '6'
+      - - C
+        - '6'
+      - - E
+        - '6'
+      type: pawn
+      origin: *16
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - D
+    - '8'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '1'
+    bg_color: white
+    occupied_by: &48 !ruby/object:King
+      color: white
+      current_square: &17
+      - E
+      - '1'
+      moves:
+      - - D
+        - '1'
+      - - D
+        - '1'
+      - - D
+        - '1'
+      type: king
+      origin: *17
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '2'
+    bg_color: black
+    occupied_by: &37 !ruby/object:Pawn
+      color: white
+      current_square: &18
+      - E
+      - '2'
+      moves:
+      - - D
+        - '3'
+      - - F
+        - '3'
+      type: pawn
+      origin: *18
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '3'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '4'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '5'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '6'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '7'
+    bg_color: white
+    occupied_by: &53 !ruby/object:Pawn
+      color: black
+      current_square: &19
+      - E
+      - '7'
+      moves:
+      - - D
+        - '6'
+      - - F
+        - '6'
+      - - D
+        - '6'
+      - - F
+        - '6'
+      - - D
+        - '6'
+      - - F
+        - '6'
+      - - D
+        - '6'
+      - - F
+        - '6'
+      type: pawn
+      origin: *19
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - E
+    - '8'
+    bg_color: black
+    occupied_by: &64 !ruby/object:King
+      color: black
+      current_square: &20
+      - E
+      - '8'
+      moves:
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      - - D
+        - '8'
+      type: king
+      origin: *20
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '1'
+    bg_color: black
+    occupied_by: &46 !ruby/object:Bishop
+      color: white
+      current_square: &21
+      - F
+      - '1'
+      moves: []
+      type: bishop
+      origin: *21
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '2'
+    bg_color: white
+    occupied_by: &38 !ruby/object:Pawn
+      color: white
+      current_square: &22
+      - F
+      - '2'
+      moves:
+      - - E
+        - '3'
+      - - G
+        - '3'
+      type: pawn
+      origin: *22
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '3'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '4'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '5'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '6'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '7'
+    bg_color: black
+    occupied_by: &54 !ruby/object:Pawn
+      color: black
+      current_square: &23
+      - F
+      - '7'
+      moves:
+      - - E
+        - '6'
+      - - G
+        - '6'
+      - - E
+        - '6'
+      - - G
+        - '6'
+      - - E
+        - '6'
+      - - G
+        - '6'
+      - - E
+        - '6'
+      - - G
+        - '6'
+      type: pawn
+      origin: *23
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - F
+    - '8'
+    bg_color: white
+    occupied_by: &62 !ruby/object:Bishop
+      color: black
+      current_square: &24
+      - F
+      - '8'
+      moves: []
+      type: bishop
+      origin: *24
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '1'
+    bg_color: white
+    occupied_by: &44 !ruby/object:Knight
+      color: white
+      current_square: &25
+      - G
+      - '1'
+      moves:
+      - - H
+        - '3'
+      - - F
+        - '3'
+      - - H
+        - '3'
+      - - F
+        - '3'
+      type: knight
+      origin: *25
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '2'
+    bg_color: black
+    occupied_by: &39 !ruby/object:Pawn
+      color: white
+      current_square: &26
+      - G
+      - '2'
+      moves:
+      - - F
+        - '3'
+      - - H
+        - '3'
+      type: pawn
+      origin: *26
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '3'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '4'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '5'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '6'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '7'
+    bg_color: white
+    occupied_by: &55 !ruby/object:Pawn
+      color: black
+      current_square: &27
+      - G
+      - '7'
+      moves:
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      type: pawn
+      origin: *27
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - G
+    - '8'
+    bg_color: black
+    occupied_by: &60 !ruby/object:Knight
+      color: black
+      current_square: &28
+      - G
+      - '8'
+      moves:
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      - - H
+        - '6'
+      - - F
+        - '6'
+      type: knight
+      origin: *28
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '1'
+    bg_color: black
+    occupied_by: &42 !ruby/object:Rook
+      color: white
+      current_square: &29
+      - H
+      - '1'
+      moves: []
+      type: rook
+      origin: *29
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '2'
+    bg_color: white
+    occupied_by: &40 !ruby/object:Pawn
+      color: white
+      current_square: &30
+      - H
+      - '2'
+      moves:
+      - - G
+        - '3'
+      type: pawn
+      origin: *30
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '3'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '4'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '5'
+    bg_color: black
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '6'
+    bg_color: white
+    occupied_by: 
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '7'
+    bg_color: black
+    occupied_by: &56 !ruby/object:Pawn
+      color: black
+      current_square: &31
+      - H
+      - '7'
+      moves:
+      - - G
+        - '6'
+      - - G
+        - '6'
+      - - G
+        - '6'
+      - - G
+        - '6'
+      type: pawn
+      origin: *31
+    illuminated: false
+  - !ruby/object:Square
+    co_ord:
+    - H
+    - '8'
+    bg_color: white
+    occupied_by: &58 !ruby/object:Rook
+      color: black
+      current_square: &32
+      - H
+      - '8'
+      moves: []
+      type: rook
+      origin: *32
+    illuminated: false
+white_pieces_in_play:
+- *33
+- *34
+- *35
+- *36
+- *37
+- *38
+- *39
+- *40
+- *41
+- *42
+- *43
+- *44
+- *45
+- *46
+- *47
+- *48
+black_pieces_in_play:
+- *49
+- *50
+- *51
+- *52
+- *53
+- *54
+- *55
+- *56
+- *57
+- *58
+- *59
+- *60
+- *61
+- *62
+- *63
+- *64
+white_king: *48
+black_king: *64
+en_passant_pieces: []
+castle_candidates:
+- - C
+  - '1'
+player_one: &65 !ruby/struct:Game::Player
+  name: a
+  color: white
+player_two: !ruby/struct:Game::Player
+  name: a
+  color: black
+active_player: *65
+active_king: *48
+analyzing_king_moveset: false

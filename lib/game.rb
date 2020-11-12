@@ -6,7 +6,7 @@ class Game
   include Output
 
   attr_reader :board
-  attr_accessor :white_pieces_in_play, :black_pieces_in_play, :white_king, :black_king, :player_one, :player_two, :active_player, :active_king, :verify_for_choice, :analyzing_king_moveset, :en_passant_pieces
+  attr_accessor :white_pieces_in_play, :black_pieces_in_play, :white_king, :black_king, :player_one, :player_two, :active_player, :active_king, :verify_for_choice, :analyzing_king_moveset, :en_passant_pieces, :castle_candidates
 
   Player = Struct.new(:name, :color)
 
@@ -70,10 +70,15 @@ class Game
     @white_king = @white_pieces_in_play.select { |piece| piece.type == 'king' }.first
     @black_king = @black_pieces_in_play.select { |piece| piece.type == 'king' }.first
     @en_passant_pieces = []
+    @castle_candidates = []
   end
 
   def switch_player
     @active_player == @player_one ? @active_player = @player_two : @active_player = @player_one
+  end
+
+  def switch_king
+    @active_player == @player_one ? @active_king = @white_king : @active_king = @black_king
   end
 
   def all_move_options(piece)
@@ -90,8 +95,8 @@ class Game
             piece.moves << [piece_and_move.last.first, en_passant_destination_row] if piece_and_move.first == piece
           end
         end
-      check_path(piece)
       end
+      check_path(piece)
     end
   end
 
@@ -428,10 +433,18 @@ class Game
 
   def turn
     switch_player
-    @active_player == @player_one ? @active_king = @white_king : @active_king = @black_king
+    switch_king
     reset_board
     return end_game if check_mate?(@active_king)
+    p castling_possible?(@active_player)
     player_move_piece(choose_piece)
+    # if castling_possible?(@active_player)
+    #   if castling_prompt == true
+    #     castle
+    #   else
+    #     player_move_piece(choose_piece)
+    #   end
+    # end
     reset_board
     clear_all_moves
   end
@@ -451,13 +464,13 @@ class Game
   end
 
   def draw_board
-    # clear_terminal
+    clear_terminal
     @board.draw
   end
 
   def reset_board
     @board.clear_illumination
-    # clear_terminal
+    clear_terminal
     @board.draw
   end
 
@@ -503,6 +516,7 @@ class Game
     @verify_for_choice = game.verify_for_choice
     @analyzing_king_moveset = game.analyzing_king_moveset
     @en_passant_pieces = game.en_passant_pieces
+    @castle_candidates = game.castle_candidates
     switch_player
   end
 
@@ -573,7 +587,46 @@ class Game
   
   end
 
-  # castling method
+  def castling_possible?(player)
+    group = @active_player.color == 'white' ? @white_pieces_in_play : @black_pieces_in_play
+    left_rook = group.select { |piece| piece.type == 'rook' && piece.current_square[0] == 'A' }[0]
+    right_rook = group.select { |piece| piece.type == 'rook' && piece.current_square[0] == 'H' }[0]
+    king = @active_king
+    @castle_candidates.clear if !@castle_candidates.empty?
+
+    return false if !king.at_origin? || (!left_rook.at_origin? && !right_rook.at_origin?) || king_in_check?(king, king.current_square)
+
+    king_column = 'E'.ord
+
+    [left_rook, right_rook].each do |rook|
+      range, king_column_jump = (('A'.ord + 1)..(king_column - 1)), -2 if rook == left_rook
+      range, king_column_jump = ((king_column + 1)..('H'.ord - 1)), 2 if rook == right_rook
+      
+      squares_between = []
+      range.each { |column_val| squares_between << @board.retrieve_square([column_val.chr, king.current_square[1]]) }
+      
+      if squares_between.all? { |square| (square.occupied_by == nil) && !king_in_check?(king, square.co_ord) }
+        temp_king_destination = [(king_column + king_column_jump).chr, king.current_square[1]] 
+        @castle_candidates << temp_king_destination if !king_in_check?(king, temp_king_destination)
+      end
+    end
+
+    @castle_candidates.length > 0 ? true : false
+
+    # X  requires king and rook to be at origin
+    # X  king must not be in check
+    # X  all squares between the two must not be occupied
+    # X  all squares between the two must not be vulnerable to attack by any opp piece 
+    # X  destination square for king must not put him in check
+  end
+
+  # def castling_prompt
+    
+  # end
+
+  # def castle
+  #   #king moves two squares towards the rook and rook moves one past the king
+  # end
 end
   
 Game.new.play
