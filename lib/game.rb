@@ -98,6 +98,17 @@ class Game
       end
       check_path(piece)
     end
+    force_defense(piece) if king_in_check?(@active_king, @active_king.current_square)
+  end
+
+  def force_defense(piece)
+    #repeated from choose_piece
+    @verify_for_choice = true
+    pieces_checking_king = king_in_check?(@active_king, @active_king.current_square)
+    @verify_for_choice = false
+    opp_piece_squares = []
+    pieces_checking_king.each { |opp_piece_checking_king| opp_piece_squares << opp_piece_checking_king.current_square }
+    piece.moves.delete_if { |move| !opp_piece_squares.include?(move) }
   end
 
   def king_viable_moves(piece) 
@@ -307,8 +318,11 @@ class Game
         formatted_choice << choice[0]
         formatted_choice << choice[1]
         self.save_game if SAVE_TRIGGER.match(choice)
-        break choice if defensive_choices.include?(formatted_choice) 
-        puts "You must choose a piece that either takes the opponent's piece putting your king in check... or move the king himself."
+        break choice if defensive_choices.include?(formatted_choice)
+        5.times { clear_line_above } 
+        puts "\nYou must choose a piece that either takes the opponent's piece putting your king in check... or move the king himself.".red
+        sleep(2.5)
+        2.times {clear_line_above }
       end
     else
       loop do
@@ -317,9 +331,11 @@ class Game
         puts "" 
         choice = gets.chomp.strip.upcase
         self.save_game if SAVE_TRIGGER.match(choice)
-        break choice if valid_choice?(choice) && piece_has_moves?(choice)
-        clear_line_above
+        break choice if (valid_choice?(choice) && piece_has_moves?(choice)) 
+        4.times { clear_line_above }
         puts "\nPlease enter a valid square... (column letter followed by row number)".red
+        sleep(1.5)
+        2.times {clear_line_above }
       end
     end
   end 
@@ -342,15 +358,25 @@ class Game
     @board.show_path(piece)
     draw_board
     co_ords = []
-    
     loop do
       puts "\nwhere would you like to move to?"
+      if piece.moves.empty? #sketchy fix for #choose_pieces passing through pieces with no moves
+        clear_line_above
+        player_move_piece(choose_piece) 
+        return
+      end
+      # p piece_has_moves?(piece.current_square)
+      # p piece.moves
+      # p @en_passant_pieces
       choice = gets.chomp.strip.upcase
       co_ords.clear
       co_ords << choice[0]
       co_ords << choice[1]
       break if piece.moves.include?(co_ords) && choice.match?(/[A-H][1-8]/)
+      3.times { clear_line_above }
       puts "\ninvalid choice... please choose from the illuminated squares".red
+      sleep(1)
+      2.times { clear_line_above }
     end
     second_square = @board.retrieve_square(co_ords)
 
@@ -493,9 +519,18 @@ class Game
     input = gets.chomp.strip.gsub(" ", "").downcase
     case input
     when "new"
+      clear_terminal
       self.game_from_scratch
     when "load"
-      self.load_game
+      if !Dir.exist?("saved_games")
+        puts "There are no saved games... initializing a new game."
+        sleep 2
+        clear_terminal
+        self.game_from_scratch
+      else
+        clear_terminal  
+        self.load_game(choose_game_file)
+      end
     end
   end
 
@@ -507,9 +542,21 @@ class Game
     create_players
   end
 
-  def load_game
-    most_recent_game = Dir[File.join("saved_games", '*')].max_by(&File.method(:ctime))
-    game = YAML.load(File.open(most_recent_game))
+  def choose_game_file
+    game_files = Dir.children("saved_games")
+    puts "\nChoose a game to open: (enter the corresponding number e.g. '[1]')"
+    game_files.each_with_index do |file, i| 
+      print "\n[#{i + 1}]".blue 
+      print " - #{file}" 
+    end
+    print "\n\n"
+    choice = gets.chomp.strip
+    chosen_file = game_files.select.with_index { |file, i| choice.to_i == i + 1 }.first
+  end
+
+  def load_game(game_file)
+    formatted_name = File.join("saved_games", game_file)
+    game = YAML.load(File.open(formatted_name))
     @board = game.board
     @player_one = game.player_one
     @player_two = game.player_two
@@ -621,12 +668,6 @@ class Game
     end
 
     @castle_candidates.length > 0 ? @castle_candidates : false
-
-    # X  requires king and rook to be at origin
-    # X  king must not be in check
-    # X  all squares between the two must not be occupied
-    # X  all squares between the two must not be vulnerable to attack by any opp piece 
-    # X  destination square for king must not put him in check
   end
 
   def execute_castle
@@ -639,8 +680,11 @@ class Game
       choice = gets.chomp.strip.upcase
       self.save_game if SAVE_TRIGGER.match(choice)
       break choice if valid_yes.match(choice) || valid_no.match(choice)
+      4.times { clear_line_above }
+      print "Please enter Y or N.".red
+      sleep(1)
       clear_line_above
-      puts "Please enter Y or N.".red
+      puts ""
     end
   end
 
@@ -656,8 +700,9 @@ end
   
 Game.new.play
 
+#pawns able to be slected even i they have no moves...(!?)
+#things start to freeze up whenever the king is put into check
 #refactor input prompts to work recursively
-#add ability to choose savefile when loading (display all files within saved_games folder)
 
 #observer design pattern to help reduce load when verifying check?, castling, or en_passant conditions
 #linked_list structure for bishop, rook, queen? (next until !square.occupied_by.nil?)
