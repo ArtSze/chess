@@ -359,15 +359,12 @@ class Game
     draw_board
     co_ords = []
     loop do
-      puts "\nwhere would you like to move to?"
+      puts "\nwhere would you like to move to? (enter the destination square e.g. 'A4')"
       if piece.moves.empty? #sketchy fix for #choose_pieces passing through pieces with no moves
         clear_line_above
         player_move_piece(choose_piece) 
         return
       end
-      # p piece_has_moves?(piece.current_square)
-      # p piece.moves
-      # p @en_passant_pieces
       choice = gets.chomp.strip.upcase
       co_ords.clear
       co_ords << choice[0]
@@ -698,12 +695,8 @@ class Game
   end
 end
   
-Game.new.play
-
-#pawns able to be slected even i they have no moves...(!?)
+#pawns able to be selected even i they have no moves...(!?) ...fixed but sketchy
 #things start to freeze up whenever the king is put into check
 #refactor input prompts to work recursively
 
-#observer design pattern to help reduce load when verifying check?, castling, or en_passant conditions
-#linked_list structure for bishop, rook, queen? (next until !square.occupied_by.nil?)
 #memoization to prevent recalculation of unchanged board states?
