@@ -13,7 +13,7 @@ class Game
   def create_players
     @player_one = Player.new(get_name(1), 'white')
     @player_two = Player.new(get_name(2), 'black')
-    @active_player = @player_two #initializes as P2 so that it switches to P1 on initial turn
+    @active_player = @player_two                   #initializes as P2 so that it switches to P1 on initial turn
     @active_king = @black_king
   end
 
@@ -89,9 +89,9 @@ class Game
       if piece.type == 'pawn'
         pawn_diag(piece)
         if @en_passant_pieces.length > 0 #if en_passant conditions exist... adds square on diagonal to move_set
-          piece.color == 'white' ? row_change = 1 : row_change = -1
+          piece.color == 'white' ? column_change = 1 : column_change = -1
           @en_passant_pieces.each do |piece_and_move|
-            en_passant_destination_row = (piece_and_move.last.last.to_i + row_change).to_s
+            en_passant_destination_row = (piece_and_move.last.last.to_i + column_change).to_s
             piece.moves << [piece_and_move.last.first, en_passant_destination_row] if piece_and_move.first == piece
           end
         end
@@ -102,7 +102,6 @@ class Game
   end
 
   def force_defense(piece)
-    #repeated from choose_piece
     @verify_for_choice = true
     pieces_checking_king = king_in_check?(@active_king, @active_king.current_square)
     @verify_for_choice = false
@@ -360,7 +359,7 @@ class Game
     co_ords = []
     loop do
       puts "\nwhere would you like to move to? (enter the destination square e.g. 'A4')"
-      if piece.moves.empty? #sketchy fix for #choose_pieces passing through pieces with no moves
+      if piece.moves.empty? 
         clear_line_above
         player_move_piece(choose_piece) 
         return
@@ -465,7 +464,7 @@ class Game
     return end_game if check_mate?(@active_king)
     puts "\n#{@active_player.color.upcase}'s turn:"
     if castling_possible?(@active_player)
-      if execute_castle == "Y" 
+      if trigger_castle == "Y" 
         castle
       else 
         4.times{ clear_line_above }
@@ -667,7 +666,7 @@ class Game
     @castle_candidates.length > 0 ? @castle_candidates : false
   end
 
-  def execute_castle
+  def trigger_castle
     valid_yes = /Y/
     valid_no = /N/
     loop do
@@ -694,9 +693,3 @@ class Game
     god_move_piece(rook_start, rook_dest)
   end
 end
-  
-#pawns able to be selected even i they have no moves...(!?) ...fixed but sketchy
-#things start to freeze up whenever the king is put into check
-#refactor input prompts to work recursively
-
-#memoization to prevent recalculation of unchanged board states?
